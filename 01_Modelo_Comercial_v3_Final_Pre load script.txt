@@ -1,0 +1,67 @@
+///$tab Main
+$(Must_Include=lib://99. Include:DataFiles/Main.qvs(txt, utf8, no labels, delimiter is ';', msq)); 
+
+
+
+
+///$tab 00. Variables
+vEsProduccion = 1;
+
+
+if vEsProduccion = 1 then 
+
+	Set vFolderTrabajo = 'lib://3. Data Transformación PRD:DataFiles/';
+
+else 
+
+	Set vFolderTrabajo = 'lib://1. Data en DES:DataFiles/';
+
+end if;
+
+let vAñoMinimoRecarga = Year(Today()-1)-5;
+///$tab 1. Hechos Ventas
+Ventas:
+LOAD
+  *
+FROM [$(vFolderTrabajo)Transformacion/01_Modelo_Comercial/Hechos_Ventas_Tra.qvd](qvd)
+WHERE YEAR(Fecha) >= $(vAñoMinimoRecarga);
+
+
+
+
+
+///$tab 3. Maestra Presupuestos
+Presupuesto_Mensual:
+LOAD
+   *
+FROM [$(vFolderTrabajo)Transformacion/01_Modelo_Comercial/Maestra_Presupuesto_Mes_Tra.qvd]
+(qvd);
+
+Presupuesto_Semanal:
+LOAD
+	*
+FROM [$(vFolderTrabajo)Transformacion/01_Modelo_Comercial/Maestra_Presupuesto_Semana_Tra.qvd](qvd);
+///$tab 5. Maestra Clientes
+Clientes_Jerarquia:
+LOAD
+   *
+FROM [$(vFolderTrabajo)Transformacion/99_Comunes/Clientes_Jerarquia_Tra.qvd](qvd)
+where Exists(Nit);
+
+
+///$tab 6. Maestra Productos
+Productos:
+LOAD
+    *
+FROM [$(vFolderTrabajo)Transformacion/99_Comunes/Maestra_Productos_Tra.qvd](qvd)
+where Exists(Código);
+
+
+///$tab 8. Calendario
+Calendario:
+LOAD
+    *
+FROM [$(vFolderTrabajo)Transformacion/01_Modelo_Comercial/Calendario_Ventas_Tra.qvd]
+(qvd);
+
+
